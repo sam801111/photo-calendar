@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#165c4b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="拍照行事曆">
+  <meta name="description" content="拍下活動海報，核對日期，加入 Google 行事曆。">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <title>拍照行事曆</title>
+</head>
+<body>
+  <main>
+    <header class="topbar"><a class="brand" href="./"><img src="./icons/icon.svg" width="32" height="32" alt="">拍照行事曆</a><button id="installHelp" class="quiet" type="button">加入主畫面 ↗</button></header>
+    <section class="hero">
+      <span class="eyebrow">從一張照片，到下一個行程</span>
+      <h1>看見活動，<br>就把時間留下來。</h1>
+      <p>拍下海報或邀請函，辨識日期，<br class="mobile">核對後加入 Google 行事曆。</p>
+      <div class="privacy"><span aria-hidden="true">◈</span> 照片在你的裝置上辨識</div>
+    </section>
+    <div class="workspace">
+      <section class="card capture" aria-labelledby="captureTitle">
+        <div class="section-heading"><span class="step">01</span><div><h2 id="captureTitle">帶入活動照片</h2><p>文字清楚、正面拍攝，效果更好</p></div></div>
+        <div id="photoArea" class="photo-area"><div id="emptyPhoto"><div class="photo-symbol" aria-hidden="true">▧</div><strong>下一個值得期待的活動</strong><p>從相機或相簿開始</p></div><img id="preview" alt="你選擇的活動照片" hidden></div>
+        <div class="capture-actions"><label class="button primary" for="cameraInput">拍一張照片</label><label class="button secondary" for="photoInput">從相簿選擇</label></div>
+        <input class="visually-hidden" id="cameraInput" type="file" accept="image/*" capture="environment">
+        <input class="visually-hidden" id="photoInput" type="file" accept="image/*">
+        <div class="scan-row"><button id="scanButton" class="button secondary" type="button" disabled>辨識照片文字</button><button id="cancelScan" class="quiet" type="button" hidden>取消辨識</button></div>
+        <progress id="progress" max="1" value="0" hidden aria-label="辨識進度"></progress>
+        <p id="scanStatus" class="hint" role="status" aria-live="polite">選擇照片後，按「辨識照片文字」。第一次需下載辨識工具，請保持連線。</p>
+        <div class="divider"></div>
+        <div class="text-heading"><label for="sourceText">辨識文字</label><button id="demoButton" type="button" class="quiet">試用範例</button></div>
+        <textarea id="sourceText" rows="6" placeholder="也可以直接貼上活動文字，例如：&#10;攝影分享會&#10;2026年11月15日 下午2:00–4:00&#10;地點：台北市中山區"></textarea>
+        <button id="parseButton" class="button secondary full" type="button">從文字整理活動</button>
+        <p class="hint">第一次下載需要網路。辨識工具來自第三方 CDN；照片不會上傳。你也能直接手動填寫右側活動。</p>
+      </section>
+      <section class="card details" aria-labelledby="detailsTitle">
+        <div class="section-heading"><span class="step">02</span><div><h2 id="detailsTitle">確認你的行程</h2><p>辨識是起點，最後由你確認</p></div></div>
+        <div id="warnings" class="notice" role="status">日期與時間尚未填寫。請先辨識照片，或自行輸入。</div>
+        <div id="candidateWrap" hidden><label for="candidate">照片中有多個日期，請選活動日期</label><select id="candidate"></select></div>
+        <form id="eventForm">
+          <label for="title">活動名稱 <span class="required">必填</span></label><input id="title" type="text" maxlength="160" placeholder="例如：週末攝影分享會" required>
+          <label for="location">地點</label><input id="location" type="text" maxlength="300" placeholder="地址、場地或線上會議連結">
+          <label class="toggle"><input id="allDay" type="checkbox"><span>全天活動</span></label>
+          <div class="field-row"><div><label for="startDate">開始日期</label><input id="startDate" type="date" required></div><div class="time-field"><label for="startTime">開始時間</label><input id="startTime" type="time" required></div></div>
+          <div class="field-row"><div><label for="endDate">結束日期</label><input id="endDate" type="date" required></div><div class="time-field"><label for="endTime">結束時間</label><input id="endTime" type="time" required></div></div>
+          <p id="timeHint" class="hint"></p>
+          <label for="notes">活動備註</label><textarea id="notes" rows="3" maxlength="3000" placeholder="需要帶什麼、報名資訊…"></textarea>
+          <div class="event-preview"><span class="eyebrow">行程預覽</span><strong id="previewTitle">你的下一個行程</strong><p id="previewDate">等待你填入日期與時間</p></div>
+          <label class="confirmation"><input id="confirmed" type="checkbox"><span>我已核對活動名稱、年份、日期與時間</span></label>
+          <button id="calendarButton" class="button primary full" type="submit" disabled>開啟 Google 行事曆 <span aria-hidden="true">↗</span></button>
+          <p class="hint">會開啟 Google 的新增活動頁面。請選擇正確帳號與行事曆，設定提醒並按「儲存」才算完成。</p>
+          <p id="formError" class="error" role="alert"></p>
+        </form>
+        <button id="resetButton" class="quiet reset" type="button">清除照片與草稿，開始下一個活動</button>
+      </section>
+    </div>
+    <footer>把生活中值得期待的事，好好記下來。<span>草稿只保留在此瀏覽器；照片不保存。</span></footer>
+  </main>
+  <dialog id="installDialog"><button id="closeDialog" class="quiet dialog-close" type="button" aria-label="關閉">✕</button><span class="eyebrow">隨手就能打開</span><h2>放到 iPhone 主畫面</h2><ol><li>用 <strong>Safari</strong> 開啟正式網站網址。</li><li>按 Safari 的分享按鈕。</li><li>選擇「加入主畫面」，若有「作為網頁 App 開啟」選項，請開啟。</li><li>按「加入」，之後點主畫面圖示即可使用。</li></ol><p class="hint">需要先將專案發布成 HTTPS 網站。直接開啟 ZIP 中的檔案不會安裝成 App。</p><button id="installDone" class="button primary full" type="button">知道了</button></dialog>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
